@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fika Events — Arrive alone. Leave with names.</title>
+<meta name="description" content="Nairobi's Tuesday night for making friends. Come alone or bring someone — we run the room so you actually meet people. Buffet included.">
+<meta property="og:title" content="Fika — Arrive alone. Leave with names.">
+<meta property="og:description" content="Nairobi's Tuesday night for making friends. Buffet included. Most people come alone.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Caveat:wght@500;700&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+/* BRAND
+   ink   #220D0C   ox (oxblood) #541409   taupe #9B8174   sand #D6C8BD
+   paper / card are the brand sand composited on white (~40% and ~18%) — tints, not new colours. */
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        ink:    '#220D0C',
+        ox:     '#541409',
+        oxLite: '#6E1D0F',   // sole hover state — oxblood lightened
+        taupe:  '#9B8174',
+        sand:   '#D6C8BD',
+        paper:  '#EFE9E3',   // sand @ ~40% on white
+        card:   '#F8F4F0',   // sand @ ~18% on white
+      },
+      fontFamily: {
+        display: ['"Adigiana Toybox"', '"Baloo 2"', 'ui-rounded', 'system-ui', 'sans-serif'],
+        hand:    ['Caveat', 'cursive'],
+        body:    ['Figtree', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
+    },
+  },
+};
+</script>
+<style>
+  /* Adigiana Toybox — drop the file at assets/fonts/AdigianaToybox.ttf and it takes over.
+     Until then the stack falls through to Baloo 2, which is close in weight and roundness. */
+  @font-face{
+    font-family:'Adigiana Toybox';
+    src:url('assets/fonts/AdigianaToybox.woff2') format('woff2'),
+        url('assets/fonts/AdigianaToybox.ttf')   format('truetype');
+    font-weight:400 900; font-style:normal; font-display:swap;
+  }
+
+  :root{
+    --shadow-soft: 0 1px 2px rgba(34,13,12,.06), 0 8px 20px -8px rgba(34,13,12,.16);
+    --shadow-lift: 0 2px 4px rgba(34,13,12,.07), 0 22px 40px -18px rgba(84,20,9,.30);
+    --shadow-stub: 0 1px 2px rgba(34,13,12,.08), 0 30px 60px -28px rgba(34,13,12,.34);
+  }
+  html{ scroll-behavior:smooth; }
+  body{
+    background-color:#EFE9E3;
+    background-image:
+      radial-gradient(70rem 40rem at 8% -10%,  rgba(155,129,116,.30), transparent 62%),
+      radial-gradient(55rem 38rem at 96% 4%,   rgba(84,20,9,.13),     transparent 60%),
+      radial-gradient(60rem 45rem at 50% 108%, rgba(214,200,189,.75), transparent 64%);
+    background-attachment: fixed;
+  }
+  /* paper grain */
+  .grain{
+    position:fixed; inset:0; z-index:60; pointer-events:none;
+    opacity:.14; mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+  }
+  .tight{ letter-spacing:-.03em; }
+  .tighter{ letter-spacing:-.045em; }
+  .lede{ line-height:1.7; }
+
+  /* --- entrance --- */
+  @keyframes rise{ from{ opacity:0; transform:translate3d(0,18px,0);} to{ opacity:1; transform:none; } }
+  .rise{ opacity:0; animation:rise .85s cubic-bezier(.22,1.1,.36,1) forwards; }
+  .d1{animation-delay:.06s}.d2{animation-delay:.14s}.d3{animation-delay:.22s}
+  .d4{animation-delay:.30s}.d5{animation-delay:.40s}.d6{animation-delay:.52s}
+
+  /* --- drifting name cloud --- */
+  @keyframes drift{
+    0%{ transform:translate3d(0,0,0) rotate(var(--r,0deg)); opacity:var(--o,.5); }
+    50%{ transform:translate3d(0,-14px,0) rotate(var(--r,0deg)); opacity:calc(var(--o,.5) + .18); }
+    100%{ transform:translate3d(0,0,0) rotate(var(--r,0deg)); opacity:var(--o,.5); }
+  }
+  .nm{
+    position:absolute; font-family:'Baloo 2',cursive; font-weight:700;
+    color:#9B8174; white-space:nowrap; user-select:none;
+    animation:drift var(--d,9s) ease-in-out infinite; animation-delay:var(--dl,0s);
+    will-change:transform,opacity;
+  }
+
+  /* --- marquee --- */
+  @keyframes slide{ from{ transform:translate3d(0,0,0);} to{ transform:translate3d(-50%,0,0);} }
+  .track{ display:flex; width:max-content; animation:slide 46s linear infinite; }
+  .marquee:hover .track{ animation-play-state:paused; }
+
+  /* --- cards --- */
+  .lift{ transition: transform .38s cubic-bezier(.22,1.1,.36,1), box-shadow .38s cubic-bezier(.22,1.1,.36,1); }
+  .lift:hover{ transform:translateY(-6px); box-shadow:var(--shadow-lift); }
+  .lift:focus-visible{ outline:3px solid #541409; outline-offset:4px; }
+
+  /* --- buttons --- */
+  .btn{ transition: transform .22s cubic-bezier(.22,1.1,.36,1), box-shadow .22s ease, background-color .22s ease; }
+  .btn:hover{ transform:translateY(-2px); }
+  .btn:active{ transform:translateY(1px) scale(.99); }
+  .btn:focus-visible{ outline:3px solid #220D0C; outline-offset:3px; }
+
+  /* --- ticket stub notches --- */
+  .stub{ position:relative; }
+  .stub::before,.stub::after{
+    content:''; position:absolute; width:30px; height:30px; border-radius:999px;
+    background:#EFE9E3; top:50%; transform:translateY(-50%);
+  }
+  .stub::before{ left:-15px; } .stub::after{ right:-15px; }
+  @media (max-width:767px){
+    .stub::before,.stub::after{ top:auto; bottom:-15px; transform:none; }
+    .stub::before{ left:calc(50% - 60px);} .stub::after{ right:calc(50% - 60px);}
+  }
+
+  /* --- dashed route line ---
+     Must pass through the dot centres: mobile = dot(14px) only -> 6px.
+     md = time col 68px + gap 32px + half dot 7px - half line 1px -> 106px. */
+  .route{ position:absolute; left:6px; top:14px; bottom:14px; width:2px;
+    background-image:linear-gradient(#D6C8BD 62%, transparent 0);
+    background-size:2px 12px; }
+  @media(min-width:768px){ .route{ left:106px; } }
+
+  /* --- FAQ --- */
+  details>summary{ list-style:none; cursor:pointer; }
+  details>summary::-webkit-details-marker{ display:none; }
+  details summary .chev{ transition:transform .3s cubic-bezier(.22,1.1,.36,1); }
+  details[open] summary .chev{ transform:rotate(45deg); }
+
+  .underline-mark{
+    background-image:linear-gradient(transparent 62%, rgba(155,129,116,.42) 0);
+    background-repeat:no-repeat; background-size:100% 100%;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; }
+    .rise{ opacity:1; }
+  }
+</style>
+</head>
+<body class="font-body text-ink antialiased overflow-x-hidden">
+<div class="grain" aria-hidden="true"></div>
+
+<!-- ============ NAV ============ -->
+<header class="sticky top-0 z-50 backdrop-blur-md bg-paper/90 border-b border-sand/50">
+  <div class="mx-auto max-w-6xl px-5 md:px-8 h-16 md:h-[74px] flex items-center justify-between gap-4">
+    <a href="#top" class="shrink-0" aria-label="Fika Events — home">
+      <img src="assets/logo-ink.png" alt="Fika Events" width="1100" height="613" class="h-8 md:h-9 w-auto">
+    </a>
+    <nav class="hidden md:flex items-center gap-8 text-[15px] font-medium text-ink/80">
+      <a href="#night" class="hover:text-ox transition-colors focus-visible:outline-2 focus-visible:outline-ox">The night</a>
+      <a href="#whats-on" class="hover:text-ox transition-colors">What's on</a>
+      <a href="#alone" class="hover:text-ox transition-colors">Coming alone?</a>
+      <a href="#faq" class="hover:text-ox transition-colors">FAQ</a>
+    </nav>
+    <a href="#book" data-wa class="btn hidden sm:inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-[14px] font-bold text-paper shadow-[0_10px_22px_-12px_rgba(34,13,12,.55)] hover:bg-ox">
+      Book a seat
+    </a>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section id="top" class="relative overflow-hidden">
+  <!-- drifting names — kept clear of the text column, hidden on small screens -->
+  <div class="pointer-events-none absolute inset-0 select-none hidden sm:block" aria-hidden="true">
+    <span class="nm text-[34px] lg:text-[46px]" style="left:27%;  top:3%;    --r:-5deg; --o:0.12; --d:12.5s;--dl:1.9s">Njeri</span>
+    <span class="nm text-[26px] lg:text-[36px]" style="left:49%;  top:2%;    --r:6deg;  --o:0.10; --d:9s;   --dl:1.1s">Kevin</span>
+    <span class="nm text-[36px] lg:text-[54px]" style="right:1.5%;top:13%;   --r:7deg;  --o:0.15; --d:12s;  --dl:.5s">Wanjiru</span>
+    <span class="nm text-[22px] lg:text-[32px]" style="right:3%;  top:34%;   --r:-5deg; --o:0.11; --d:10s;  --dl:1.6s">Sam</span>
+    <span class="nm text-[28px] lg:text-[40px]" style="right:9%;  top:53%;   --r:4deg;  --o:0.12; --d:10.5s;--dl:.3s">Priya</span>
+    <span class="nm text-[30px] lg:text-[46px]" style="right:3%;  bottom:23%;--r:5deg;  --o:0.14; --d:13s;  --dl:.9s">Achieng</span>
+    <span class="nm text-[26px] lg:text-[38px]" style="right:26%; bottom:5%; --r:-7deg; --o:0.12; --d:11.5s;--dl:1.4s">Zawadi</span>
+    <span class="nm text-[24px] lg:text-[34px]" style="left:56%;  bottom:9%; --r:-6deg; --o:0.10; --d:9.5s; --dl:2.1s">Brian</span>
+    <span class="nm hidden lg:block text-[34px]" style="left:1%;  bottom:31%;--r:-8deg; --o:0.10; --d:11s;  --dl:.2s">Amina</span>
+  </div>
+
+  <div class="relative mx-auto max-w-6xl px-5 md:px-8 pt-14 pb-16 md:pt-24 md:pb-24">
+    <p class="rise d1 inline-flex items-center gap-2 rounded-full border border-sand bg-card/90 px-4 py-1.5 text-[12.5px] font-bold uppercase tracking-[.14em] text-ink/80 shadow-[var(--shadow-soft)]">
+      <span class="h-1.5 w-1.5 rounded-full bg-ox"></span> Every Tuesday · Nairobi
+    </p>
+
+    <h1 class="rise d2 mt-6 font-display font-extrabold tighter text-[clamp(3.1rem,12vw,7.4rem)] leading-[.92]">
+      Arrive alone.<br>
+      <span class="text-ox">Leave with names.</span>
+    </h1>
+
+    <p class="rise d3 mt-6 max-w-[42ch] text-[17px] md:text-[19px] lede text-ink/80">
+      Fika is a Tuesday night built for one thing: actually meeting people. We run the room — you get
+      seated with new faces, given something to do, and never left standing in a corner holding a drink.
+    </p>
+
+    <p class="rise d3 mt-3 font-hand text-[22px] md:text-[26px] text-ink/55">
+      <em>fika</em> — Swahili: to arrive. Swedish: a coffee break with people you like.
+    </p>
+
+    <div class="rise d4 mt-9 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+      <a href="#book" data-wa class="btn inline-flex items-center justify-center gap-2.5 rounded-full bg-ox px-7 py-4 text-[16px] font-bold text-paper shadow-[0_14px_30px_-12px_rgba(84,20,9,.55)] hover:bg-oxLite">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2m0 1.67c2.2 0 4.27.86 5.83 2.42a8.2 8.2 0 0 1 2.41 5.82c0 4.54-3.7 8.24-8.25 8.24a8.23 8.23 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24m-2.6 4.1c-.19 0-.5.07-.76.35s-1 .98-1 2.39 1.02 2.77 1.17 2.96c.14.19 2 3.05 4.85 4.28.68.29 1.2.46 1.61.6.68.21 1.3.18 1.79.11.55-.08 1.68-.69 1.92-1.35s.24-1.23.17-1.35c-.07-.12-.26-.19-.55-.33s-1.68-.83-1.94-.93c-.26-.09-.45-.14-.64.14s-.73.93-.9 1.12c-.16.19-.33.21-.61.07s-1.19-.44-2.27-1.4c-.84-.75-1.4-1.67-1.57-1.95s-.02-.44.12-.58c.13-.13.29-.33.43-.5.14-.16.19-.28.28-.47.1-.19.05-.35-.02-.49s-.64-1.54-.87-2.11c-.23-.55-.47-.48-.64-.49h-.55Z"/></svg>
+        Book on WhatsApp
+      </a>
+      <a href="#night" class="btn inline-flex items-center justify-center gap-2 rounded-full border-2 border-ink/15 bg-card px-7 py-4 text-[16px] font-bold text-ink hover:border-ink/35">
+        See how a night works
+      </a>
+    </div>
+
+    <!-- next tuesday card -->
+    <div class="rise d5 mt-12 md:mt-14 inline-flex flex-wrap items-center gap-x-5 gap-y-2 rounded-2xl border border-sand bg-card px-5 py-4 shadow-[var(--shadow-soft)]">
+      <span class="font-hand text-[24px] text-ox" data-next-label>Up next</span>
+      <span class="font-display font-bold text-[19px] tight" data-next-title>—</span>
+      <span class="h-4 w-px bg-sand hidden sm:block"></span>
+      <span class="text-[15px] font-medium text-ink/80" data-next-date>—</span>
+      <span class="h-4 w-px bg-sand hidden sm:block"></span>
+      <span class="text-[15px] font-bold text-ox" data-next-price>—</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MARQUEE ============ -->
+<div class="marquee relative overflow-hidden border-y border-sand bg-ink py-3.5 select-none" aria-hidden="true">
+  <div class="track items-center gap-8 text-paper/85 font-display font-semibold text-[15px] md:text-[17px] tight whitespace-nowrap">
+    <span>🎲 Game Night</span><span class="text-sand">✱</span>
+    <span>🎵 Music Bingo</span><span class="text-sand">✱</span>
+    <span>🎨 Paint Your Neighbour</span><span class="text-sand">✱</span>
+    <span>📊 Mystery Slides</span><span class="text-sand">✱</span>
+    <span>🧳 New In Town</span><span class="text-sand">✱</span>
+    <span>🎤 Bad Talent Night</span><span class="text-sand">✱</span>
+    <span>💃 Salsa Social</span><span class="text-sand">✱</span>
+    <span>🎃 Halloween</span><span class="text-sand">✱</span>
+    <span>🎙️ Pitch Your Friend</span><span class="text-sand">✱</span>
+    <span>🍕 No Small Talk</span><span class="text-sand">✱</span>
+    <span>🗣️ Debate Night</span><span class="text-sand">✱</span>
+    <span>🦃 Friendsgiving</span><span class="text-sand">✱</span>
+    <span>🎲 Game Night</span><span class="text-sand">✱</span>
+    <span>🎵 Music Bingo</span><span class="text-sand">✱</span>
+    <span>🎨 Paint Your Neighbour</span><span class="text-sand">✱</span>
+    <span>📊 Mystery Slides</span><span class="text-sand">✱</span>
+    <span>🧳 New In Town</span><span class="text-sand">✱</span>
+    <span>🎤 Bad Talent Night</span><span class="text-sand">✱</span>
+    <span>💃 Salsa Social</span><span class="text-sand">✱</span>
+    <span>🎃 Halloween</span><span class="text-sand">✱</span>
+    <span>🎙️ Pitch Your Friend</span><span class="text-sand">✱</span>
+    <span>🍕 No Small Talk</span><span class="text-sand">✱</span>
+    <span>🗣️ Debate Night</span><span class="text-sand">✱</span>
+    <span>🦃 Friendsgiving</span><span class="text-sand">✱</span>
+  </div>
+</div>
+
+<!-- ============ THE PROBLEM / PROMISE ============ -->
+<section class="mx-auto max-w-6xl px-5 md:px-8 py-20 md:py-28">
+  <div class="grid md:grid-cols-12 gap-10 md:gap-14 items-start">
+    <div class="md:col-span-5">
+      <h2 class="font-display font-extrabold tighter text-[clamp(2.1rem,5.4vw,3.3rem)] leading-[1.02]">
+        Making friends as an adult is <span class="underline-mark">badly designed.</span>
+      </h2>
+    </div>
+    <div class="md:col-span-7 md:pt-2">
+      <p class="text-[17px] md:text-[18px] lede text-ink/80">
+        You show up somewhere new, everyone's already in a group, and you spend the night talking to the
+        one person you came with. Or you don't go at all.
+      </p>
+      <p class="mt-5 text-[17px] md:text-[18px] lede text-ink/80">
+        So we removed the hard part. At Fika you don't choose your table, you don't have to walk up to
+        strangers, and you never have to think of something to say — there's a prompt on the table and a
+        host running the room. You just turn up.
+      </p>
+      <div class="mt-9 grid sm:grid-cols-3 gap-4">
+        <div class="rounded-2xl border border-sand bg-card p-5 shadow-[var(--shadow-soft)]">
+          <p class="font-display font-extrabold text-[30px] leading-none text-ox tight">~15</p>
+          <p class="mt-2 text-[14.5px] leading-snug text-ink/80">people you'll properly talk to — not 60 handshakes</p>
+        </div>
+        <div class="rounded-2xl border border-sand bg-card p-5 shadow-[var(--shadow-soft)]">
+          <p class="font-display font-extrabold text-[30px] leading-none text-ox tight">3 hrs</p>
+          <p class="mt-2 text-[14.5px] leading-snug text-ink/80">structured start, buffet in the middle, open mingle to close</p>
+        </div>
+        <div class="rounded-2xl border border-sand bg-card p-5 shadow-[var(--shadow-soft)]">
+          <p class="font-display font-extrabold text-[30px] leading-none text-ox tight">Most</p>
+          <p class="mt-2 text-[14.5px] leading-snug text-ink/80">people here came on their own. It's the normal way to come.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW A NIGHT WORKS ============ -->
+<section id="night" class="relative border-y border-sand bg-card/70">
+  <div class="mx-auto max-w-6xl px-5 md:px-8 py-20 md:py-28">
+    <p class="font-hand text-[26px] text-ox">the run of the night</p>
+    <h2 class="mt-1 font-display font-extrabold tighter text-[clamp(2.2rem,6vw,3.8rem)] leading-[1]">
+      What actually happens
+    </h2>
+    <p class="mt-4 max-w-[52ch] text-[17px] lede text-ink/80">
+      Same shape every week. Only the middle changes — that's the themed bit. You can walk in cold at
+      6:55 having never been before and take part in all of it.
+    </p>
+
+    <div class="relative mt-12 md:mt-14">
+      <div class="route" aria-hidden="true"></div>
+      <ol class="space-y-3.5">
+        <!-- item -->
+        <li class="relative flex gap-4 md:gap-8">
+          <div class="hidden md:block w-[68px] shrink-0 pt-5 text-right font-display font-bold text-[15px] text-ink/55 tabular-nums">6:30</div>
+          <span class="relative z-10 mt-5 h-3.5 w-3.5 shrink-0 rounded-full bg-sand ring-4 ring-card" aria-hidden="true"></span>
+          <div class="lift flex-1 rounded-2xl border border-sand bg-card p-5 md:p-6 shadow-[var(--shadow-soft)]">
+            <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <h3 class="font-display font-bold text-[19px] md:text-[21px] tight">You arrive</h3>
+              <span class="md:hidden font-display font-bold text-[13px] text-ink/55 tabular-nums">6:30</span>
+            </div>
+            <p class="mt-1.5 text-[15.5px] leading-relaxed text-ink/80">Name tag at the door, then someone walks you to a table. Nobody gets left standing on their own — that's a rule, not a hope.</p>
+          </div>
+        </li>
+        <li class="relative flex gap-4 md:gap-8">
+          <div class="hidden md:block w-[68px] shrink-0 pt-5 text-right font-display font-bold text-[15px] text-ink/55 tabular-nums">7:00</div>
+          <span class="relative z-10 mt-5 h-3.5 w-3.5 shrink-0 rounded-full bg-sand ring-4 ring-card" aria-hidden="true"></span>
+          <div class="lift flex-1 rounded-2xl border border-sand bg-card p-5 md:p-6 shadow-[var(--shadow-soft)]">
+            <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <h3 class="font-display font-bold text-[19px] md:text-[21px] tight">The room warms up</h3>
+              <span class="md:hidden font-display font-bold text-[13px] text-ink/55 tabular-nums">7:00</span>
+            </div>
+            <p class="mt-1.5 text-[15.5px] leading-relaxed text-ink/80">One quick thing on your feet that gets 40 people laughing in about four minutes. No talent required.</p>
+          </div>
+        </li>
+        <li class="relative flex gap-4 md:gap-8">
+          <div class="hidden md:block w-[68px] shrink-0 pt-5 text-right font-display font-bold text-[15px] text-ink/55 tabular-nums">7:10</div>
+          <span class="relative z-10 mt-5 h-3.5 w-3.5 shrink-0 rounded-full bg-ox ring-4 ring-card" aria-hidden="true"></span>
+          <div class="lift flex-1 rounded-2xl border-2 border-ox/25 bg-card p-5 md:p-6 shadow-[var(--shadow-soft)]">
+            <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <h3 class="font-display font-bold text-[19px] md:text-[21px] tight">Speed friendship</h3>
+              <span class="rounded-full bg-ox/10 px-2.5 py-0.5 text-[11.5px] font-bold uppercase tracking-wider text-ox">the bit that makes it work</span>
+              <span class="md:hidden font-display font-bold text-[13px] text-ink/55 tabular-nums">7:10</span>
+            </div>
+            <p class="mt-1.5 text-[15.5px] leading-relaxed text-ink/80">Small tables, three rounds. Between each one, half your table gets up and moves. Prompt cards sit on the table so you never have to invent a conversation from nothing.</p>
+          </div>
+        </li>
+        <li class="relative flex gap-4 md:gap-8">
+          <div class="hidden md:block w-[68px] shrink-0 pt-5 text-right font-display font-bold text-[15px] text-ink/55 tabular-nums">7:55</div>
+          <span class="relative z-10 mt-5 h-3.5 w-3.5 shrink-0 rounded-full bg-sand ring-4 ring-card" aria-hidden="true"></span>
+          <div class="lift flex-1 rounded-2xl border border-sand bg-card p-5 md:p-6 shadow-[var(--shadow-soft)]">
+            <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <h3 class="font-display font-bold text-[19px] md:text-[21px] tight">Food</h3>
+              <span class="md:hidden font-display font-bold text-[13px] text-ink/55 tabular-nums">7:55</span>
+            </div>
+            <p class="mt-1.5 text-[15.5px] leading-relaxed text-ink/80">Buffet opens — it's included in your ticket. Pasta, pizza, chips, something sweet.</p>
+          </div>
+        </li>
+        <li class="relative flex gap-4 md:gap-8">
+          <div class="hidden md:block w-[68px] shrink-0 pt-5 text-right font-display font-bold text-[15px] text-ink/55 tabular-nums">8:05</div>
+          <span class="relative z-10 mt-5 h-3.5 w-3.5 shrink-0 rounded-full bg-sand ring-4 ring-card" aria-hidden="true"></span>
+          <div class="lift flex-1 rounded-2xl border border-sand bg-card p-5 md:p-6 shadow-[var(--shadow-soft)]">
+            <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <h3 class="font-display font-bold text-[19px] md:text-[21px] tight">The main event</h3>
+              <span class="rounded-full bg-sand/20 px-2.5 py-0.5 text-[11.5px] font-bold uppercase tracking-wider text-ink/80">changes weekly</span>
+              <span class="md:hidden font-display font-bold text-[13px] text-ink/55 tabular-nums">8:05</span>
+            </div>
+            <p class="mt-1.5 text-[15.5px] leading-relaxed text-ink/80">Games, a talent show, a paint-off, a debate — whatever that Tuesday is. Always in teams, always with people you haven't met.</p>
+          </div>
+        </li>
+        <li class="relative flex gap-4 md:gap-8">
+          <div class="hidden md:block w-[68px] shrink-0 pt-5 text-right font-display font-bold text-[15px] text-ink/55 tabular-nums">9:15</div>
+          <span class="relative z-10 mt-5 h-3.5 w-3.5 shrink-0 rounded-full bg-sand ring-4 ring-card" aria-hidden="true"></span>
+          <div class="lift flex-1 rounded-2xl border border-sand bg-card p-5 md:p-6 shadow-[var(--shadow-soft)]">
+            <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <h3 class="font-display font-bold text-[19px] md:text-[21px] tight">Three names</h3>
+              <span class="md:hidden font-display font-bold text-[13px] text-ink/55 tabular-nums">9:15</span>
+            </div>
+            <p class="mt-1.5 text-[15.5px] leading-relaxed text-ink/80">Everyone writes down three people they'd want to see again. We introduce you properly the next morning.</p>
+          </div>
+        </li>
+        <li class="relative flex gap-4 md:gap-8">
+          <div class="hidden md:block w-[68px] shrink-0 pt-5 text-right font-display font-bold text-[15px] text-ink/55 tabular-nums">9:30</div>
+          <span class="relative z-10 mt-5 h-3.5 w-3.5 shrink-0 rounded-full bg-sand ring-4 ring-card" aria-hidden="true"></span>
+          <div class="lift flex-1 rounded-2xl border border-sand bg-card p-5 md:p-6 shadow-[var(--shadow-soft)]">
+            <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <h3 class="font-display font-bold text-[19px] md:text-[21px] tight">Mingle</h3>
+              <span class="md:hidden font-display font-bold text-[13px] text-ink/55 tabular-nums">9:30</span>
+            </div>
+            <p class="mt-1.5 text-[15.5px] leading-relaxed text-ink/80">Nothing structured. Go and find the people you liked. This is where the friendships actually happen.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHAT'S ON ============ -->
+<section id="whats-on" class="mx-auto max-w-6xl px-5 md:px-8 py-20 md:py-28">
+  <div class="flex flex-wrap items-end justify-between gap-5">
+    <div>
+      <p class="font-hand text-[26px] text-ox">every tuesday, 7–10pm</p>
+      <h2 class="mt-1 font-display font-extrabold tighter text-[clamp(2.2rem,6vw,3.8rem)] leading-[1]">What's on</h2>
+    </div>
+    <p class="max-w-[34ch] text-[15.5px] leading-relaxed text-ink/80">
+      Every night stands on its own. Come to one, come to five — you'll never be behind.
+    </p>
+  </div>
+
+  <div id="grid" class="mt-11 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
+</section>
+
+<!-- ============ COMING ALONE ============ -->
+<section id="alone" class="relative overflow-hidden border-y border-sand bg-ink text-paper">
+  <div class="pointer-events-none absolute inset-0 opacity-[.16]" aria-hidden="true"
+       style="background-image:radial-gradient(40rem 26rem at 12% 0%, #9B8174, transparent 60%), radial-gradient(38rem 26rem at 92% 100%, #541409, transparent 58%);"></div>
+  <div class="relative mx-auto max-w-6xl px-5 md:px-8 py-20 md:py-28">
+    <div class="grid md:grid-cols-12 gap-10 md:gap-16 items-center">
+      <div class="md:col-span-7">
+        <p class="font-hand text-[28px] text-sand">the honest bit</p>
+        <h2 class="mt-1 font-display font-extrabold tighter text-[clamp(2.2rem,6vw,3.7rem)] leading-[1.02]">
+          Thinking of coming<br>on your own?
+        </h2>
+        <p class="mt-6 max-w-[46ch] text-[17px] md:text-[18px] lede text-paper/85">
+          Good. That's how most of the room got here. Coming alone isn't the brave option at Fika — it's
+          the default one, and the whole night is built around it.
+        </p>
+        <p class="mt-4 max-w-[46ch] text-[17px] md:text-[18px] lede text-paper/85">
+          If you do bring someone, we'll seat you apart for the first hour. You'll thank us. You came to
+          meet people, not to talk to the person you already know.
+        </p>
+        <a href="#book" data-wa class="btn mt-9 inline-flex items-center gap-2.5 rounded-full bg-sand px-7 py-4 text-[16px] font-bold text-ink shadow-[0_14px_30px_-14px_rgba(214,200,189,.5)] hover:bg-white">
+          Save me a seat
+        </a>
+      </div>
+
+      <div class="md:col-span-5">
+        <ul class="space-y-3.5">
+          <li class="flex gap-3.5 rounded-2xl border border-paper/15 bg-paper/[.07] p-5 backdrop-blur-sm">
+            <span class="mt-0.5 shrink-0 font-display font-bold text-sand/70 text-[18px]">01</span>
+            <p class="text-[15.5px] leading-relaxed text-paper/90"><strong class="font-bold text-paper">You're seated, not stranded.</strong> Someone walks you to a table the moment you walk in.</p>
+          </li>
+          <li class="flex gap-3.5 rounded-2xl border border-paper/15 bg-paper/[.07] p-5 backdrop-blur-sm">
+            <span class="mt-0.5 shrink-0 font-display font-bold text-sand/70 text-[18px]">02</span>
+            <p class="text-[15.5px] leading-relaxed text-paper/90"><strong class="font-bold text-paper">Nobody has to break the ice.</strong> There's a host running the room and a prompt on every table.</p>
+          </li>
+          <li class="flex gap-3.5 rounded-2xl border border-paper/15 bg-paper/[.07] p-5 backdrop-blur-sm">
+            <span class="mt-0.5 shrink-0 font-display font-bold text-sand/70 text-[18px]">03</span>
+            <p class="text-[15.5px] leading-relaxed text-paper/90"><strong class="font-bold text-paper">The room is balanced.</strong> Tickets are kept roughly even, so it never tips one way.</p>
+          </li>
+          <li class="flex gap-3.5 rounded-2xl border border-paper/15 bg-paper/[.07] p-5 backdrop-blur-sm">
+            <span class="mt-0.5 shrink-0 font-display font-bold text-sand/70 text-[18px]">04</span>
+            <p class="text-[15.5px] leading-relaxed text-paper/90"><strong class="font-bold text-paper">If anything feels off, tell us.</strong> There's a named person on the door all night. We never share your number.</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TICKET / PRICE ============ -->
+<section id="book" class="mx-auto max-w-6xl px-5 md:px-8 py-20 md:py-28">
+  <div class="grid md:grid-cols-12 gap-10 md:gap-14 items-center">
+    <div class="md:col-span-5">
+      <p class="font-hand text-[26px] text-ox">what it costs</p>
+      <h2 class="mt-1 font-display font-extrabold tighter text-[clamp(2.2rem,6vw,3.5rem)] leading-[1.02]">
+        One ticket.<br>Dinner included.
+      </h2>
+      <p class="mt-5 max-w-[40ch] text-[17px] lede text-ink/80">
+        No membership, no sign-up, no app. Message us on WhatsApp, pay to hold your seat, turn up on
+        Tuesday. Seats are limited on purpose — a room this size only works small.
+      </p>
+      <p class="mt-4 font-hand text-[23px] text-ink/55">
+        Coming back? Ask about the punch card — 5 nights, no expiry.
+      </p>
+    </div>
+
+    <div class="md:col-span-7">
+      <div class="stub relative overflow-hidden rounded-3xl border border-sand bg-card shadow-[var(--shadow-stub)]">
+        <div class="grid md:grid-cols-[1.15fr_auto_1fr]">
+          <div class="p-7 md:p-9">
+            <p class="text-[12.5px] font-bold uppercase tracking-[.16em] text-ink/55">Standard Tuesday</p>
+            <p class="mt-2 font-display font-extrabold tighter text-[clamp(2.8rem,8vw,4rem)] leading-none">
+              KES 1,800
+            </p>
+            <ul class="mt-6 space-y-2.5 text-[15.5px] text-ink/80">
+              <li class="flex gap-2.5"><span class="text-ox font-bold">✓</span> Entry + the full three hours</li>
+              <li class="flex gap-2.5"><span class="text-ox font-bold">✓</span> Buffet dinner &amp; something sweet</li>
+              <li class="flex gap-2.5"><span class="text-ox font-bold">✓</span> Everything the night needs — cards, games, materials</li>
+              <li class="flex gap-2.5"><span class="text-ox font-bold">✓</span> A seat you don't have to find yourself</li>
+            </ul>
+          </div>
+
+          <div class="hidden md:block w-px my-8 bg-[linear-gradient(#D6C8BD_60%,transparent_0)] bg-[length:1px_10px]"></div>
+
+          <div class="border-t md:border-t-0 border-sand p-7 md:p-9 flex flex-col justify-center">
+            <p class="text-[12.5px] font-bold uppercase tracking-[.16em] text-ink/55">Special nights</p>
+            <dl class="mt-3 space-y-2 text-[15px]">
+              <div class="flex justify-between gap-3"><dt class="text-ink/80">New In Town · 6 Oct</dt><dd class="font-bold">1,500</dd></div>
+              <div class="flex justify-between gap-3"><dt class="text-ink/80">Halloween · 27 Oct</dt><dd class="font-bold">2,200</dd></div>
+              <div class="flex justify-between gap-3"><dt class="text-ink/80">Friendsgiving · 24 Nov</dt><dd class="font-bold">2,500</dd></div>
+            </dl>
+            <a href="#" data-wa class="btn mt-6 inline-flex items-center justify-center gap-2.5 rounded-full bg-ox px-6 py-3.5 text-[15.5px] font-bold text-paper shadow-[0_12px_26px_-12px_rgba(84,20,9,.6)] hover:bg-oxLite">
+              Book on WhatsApp
+            </a>
+            <p class="mt-3 text-center text-[13px] text-ink/55">Payment holds your seat · limited spots</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section id="faq" class="border-t border-sand bg-card/70">
+  <div class="mx-auto max-w-4xl px-5 md:px-8 py-20 md:py-28">
+    <h2 class="font-display font-extrabold tighter text-[clamp(2.2rem,6vw,3.5rem)] leading-[1]">
+      Questions people ask
+    </h2>
+    <div class="mt-10 divide-y divide-sand border-y border-sand">
+      <details class="group">
+        <summary class="flex items-center justify-between gap-6 py-5 font-display font-bold text-[18px] md:text-[20px] tight hover:text-ox transition-colors">
+          Can I really come on my own?
+          <span class="chev shrink-0 text-ox text-[22px] leading-none">+</span>
+        </summary>
+        <p class="pb-6 pr-8 text-[16px] lede text-ink/80">Yes — most people do, and it's the easiest way to come. You're seated with new people the second you arrive and the whole first hour is structured, so there's no point in the night where you're stood on your own working out who to talk to.</p>
+      </details>
+      <details class="group">
+        <summary class="flex items-center justify-between gap-6 py-5 font-display font-bold text-[18px] md:text-[20px] tight hover:text-ox transition-colors">
+          Do I need to be good at anything?
+          <span class="chev shrink-0 text-ox text-[22px] leading-none">+</span>
+        </summary>
+        <p class="pb-6 pr-8 text-[16px] lede text-ink/80">No. Nothing needs preparing, learning or practising beforehand. Paint night doesn't need painters, salsa doesn't need dancers, and talent night specifically doesn't want talent.</p>
+      </details>
+      <details class="group">
+        <summary class="flex items-center justify-between gap-6 py-5 font-display font-bold text-[18px] md:text-[20px] tight hover:text-ox transition-colors">
+          Is there alcohol?
+          <span class="chev shrink-0 text-ox text-[22px] leading-none">+</span>
+        </summary>
+        <p class="pb-6 pr-8 text-[16px] lede text-ink/80">Fika itself is dry — the night doesn't run on drinking. The venue bar is open if you want something, and plenty of people have nothing at all. Nobody notices either way.</p>
+      </details>
+      <details class="group">
+        <summary class="flex items-center justify-between gap-6 py-5 font-display font-bold text-[18px] md:text-[20px] tight hover:text-ox transition-colors">
+          What's included in the ticket?
+          <span class="chev shrink-0 text-ox text-[22px] leading-none">+</span>
+        </summary>
+        <p class="pb-6 pr-8 text-[16px] lede text-ink/80">Entry, the full three hours, and the buffet — pasta or pizza, chips, and something sweet. Everything the night needs is provided. Drinks from the bar are the only extra.</p>
+      </details>
+      <details class="group">
+        <summary class="flex items-center justify-between gap-6 py-5 font-display font-bold text-[18px] md:text-[20px] tight hover:text-ox transition-colors">
+          Who comes to this?
+          <span class="chev shrink-0 text-ox text-[22px] leading-none">+</span>
+        </summary>
+        <p class="pb-6 pr-8 text-[16px] lede text-ink/80">Mostly people in their twenties and thirties, from all over Nairobi — a lot of them new to the city or coming out of a stretch where their social life got small. Tickets are kept roughly balanced so the room never tips one way.</p>
+      </details>
+      <details class="group">
+        <summary class="flex items-center justify-between gap-6 py-5 font-display font-bold text-[18px] md:text-[20px] tight hover:text-ox transition-colors">
+          Can I bring a friend?
+          <span class="chev shrink-0 text-ox text-[22px] leading-none">+</span>
+        </summary>
+        <p class="pb-6 pr-8 text-[16px] lede text-ink/80">Please do. We'll seat you at different tables for the first hour and reunite you for the mingle — otherwise you'd spend the night talking to each other, which you can do any day of the week.</p>
+      </details>
+      <details class="group">
+        <summary class="flex items-center justify-between gap-6 py-5 font-display font-bold text-[18px] md:text-[20px] tight hover:text-ox transition-colors">
+          How do I book?
+          <span class="chev shrink-0 text-ox text-[22px] leading-none">+</span>
+        </summary>
+        <p class="pb-6 pr-8 text-[16px] lede text-ink/80">Message us on WhatsApp and we'll send you the details. Payment holds your seat — we cap numbers and cook to a headcount, so we can't hold a place without it.</p>
+      </details>
+      <details class="group">
+        <summary class="flex items-center justify-between gap-6 py-5 font-display font-bold text-[18px] md:text-[20px] tight hover:text-ox transition-colors">
+          Where is it?
+          <span class="chev shrink-0 text-ox text-[22px] leading-none">+</span>
+        </summary>
+        <p class="pb-6 pr-8 text-[16px] lede text-ink/80">Nairobi. We send the venue and a pin when you book.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="relative overflow-hidden bg-ink text-paper">
+  <div class="mx-auto max-w-6xl px-5 md:px-8 py-16 md:py-20">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-10">
+      <div>
+        <a href="#top" class="inline-block" aria-label="Fika Events">
+          <img src="assets/logo-sand.png" alt="Fika Events" width="1100" height="613" class="h-20 md:h-24 w-auto">
+        </a>
+        <p class="mt-6 font-display font-bold text-[22px] md:text-[26px] tight text-paper">Arrive alone. Leave with names.</p>
+        <p class="mt-2 text-[15px] text-paper/60">Every Tuesday · Nairobi · 7–10pm</p>
+      </div>
+      <div class="flex flex-col gap-3 md:items-end">
+        <a href="#" data-ig class="btn inline-flex items-center gap-2.5 rounded-full border border-paper/25 px-5 py-3 text-[15px] font-bold text-paper hover:border-paper/60">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16m0-2.16C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63c-.79.3-1.46.72-2.12 1.39C1.35 2.68.93 3.35.63 4.14.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.3.79.72 1.46 1.39 2.12.66.67 1.33 1.09 2.12 1.39.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56.79-.3 1.46-.72 2.12-1.39.67-.66 1.09-1.33 1.39-2.12.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91-.3-.79-.72-1.46-1.39-2.12A5.86 5.86 0 0 0 19.86.63c-.76-.3-1.64-.5-2.91-.56C15.67.01 15.26 0 12 0Zm0 5.84a6.16 6.16 0 1 0 0 12.32 6.16 6.16 0 0 0 0-12.32Zm0 10.16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm7.85-10.4a1.44 1.44 0 1 1-2.88 0 1.44 1.44 0 0 1 2.88 0Z"/></svg>
+          Follow on Instagram
+        </a>
+        <a href="#" data-wa class="btn inline-flex items-center justify-center gap-2.5 rounded-full bg-paper px-5 py-3 text-[15px] font-bold text-ink hover:bg-white">
+          Book a seat
+        </a>
+      </div>
+    </div>
+    <div class="mt-14 flex flex-col sm:flex-row justify-between gap-3 border-t border-paper/15 pt-6 text-[13.5px] text-paper/50">
+      <p>© 2026 Fika Events</p>
+      <p class="font-hand text-[19px] text-paper/60">come alone, the circle gets bigger</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ STICKY MOBILE CTA ============ -->
+<div id="stickyCta" class="sm:hidden fixed bottom-0 inset-x-0 z-50 border-t border-sand bg-paper/95 backdrop-blur-md px-4 py-3 pb-[calc(.75rem+env(safe-area-inset-bottom))] translate-y-full opacity-0 transition-[transform,opacity] duration-300 ease-out">
+  <a href="#" data-wa class="btn flex items-center justify-center gap-2.5 rounded-full bg-ox px-6 py-3.5 text-[16px] font-bold text-paper shadow-[0_12px_26px_-12px_rgba(84,20,9,.6)]">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2m0 1.67c2.2 0 4.27.86 5.83 2.42a8.2 8.2 0 0 1 2.41 5.82c0 4.54-3.7 8.24-8.25 8.24a8.23 8.23 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24m-2.6 4.1c-.19 0-.5.07-.76.35s-1 .98-1 2.39 1.02 2.77 1.17 2.96c.14.19 2 3.05 4.85 4.28.68.29 1.2.46 1.61.6.68.21 1.3.18 1.79.11.55-.08 1.68-.69 1.92-1.35s.24-1.23.17-1.35c-.07-.12-.26-.19-.55-.33s-1.68-.83-1.94-.93c-.26-.09-.45-.14-.64.14s-.73.93-.9 1.12c-.16.19-.33.21-.61.07s-1.19-.44-2.27-1.4c-.84-.75-1.4-1.67-1.57-1.95s-.02-.44.12-.58c.13-.13.29-.33.43-.5.14-.16.19-.28.28-.47.1-.19.05-.35-.02-.49s-.64-1.54-.87-2.11c-.23-.55-.47-.48-.64-.49h-.55Z"/></svg>
+    Book Tuesday on WhatsApp
+  </a>
+</div>
+
+<script>
+/* =========================================================================
+   FIKA — edit these three things and the whole site updates.
+   ========================================================================= */
+
+// 1. Your WhatsApp Business number, international format, digits only.
+const WHATSAPP_NUMBER = '254700000000';        // ← REPLACE
+
+// 2. Your Instagram handle, no @.
+const INSTAGRAM_HANDLE = 'fika.events';        // ← REPLACE
+
+// 3. The nights. Add/edit freely — the page rebuilds itself.
+const NIGHTS = [
+  { date:'2026-09-08', label:'Tue 8 Sept',  emoji:'🎲', title:'Game Night',          price:1800, blurb:"Six tables, six games, and you don't get to keep your seat. The easiest possible first night." },
+  { date:'2026-09-15', label:'Tue 15 Sept', emoji:'🎵', title:'Music Bingo & Trivia', price:1800, blurb:'Fifteen seconds of a song, a bingo card, and a table that is now your team. Loud from the start.' },
+  { date:'2026-09-22', label:'Tue 22 Sept', emoji:'🎨', title:'Paint Your Neighbour', price:1800, blurb:'You paint the person opposite you. They paint you. Nobody here can paint. You take it home.' },
+  { date:'2026-09-29', label:'Tue 29 Sept', emoji:'📊', title:'Mystery Slides',       price:1800, blurb:"Present a slide deck you have never seen before, with total confidence. Three minutes. Go." },
+  { date:'2026-10-06', label:'Tue 6 Oct',   emoji:'🧳', title:'New In Town',          price:1500, blurb:'For anyone who moved to Nairobi and is quietly starting from scratch. Locals come too.' },
+  { date:'2026-10-13', label:'Tue 13 Oct',  emoji:'🎤', title:'Bad Talent Night',     price:1800, blurb:'Acts are judged on commitment, not talent. Your table forms one on the spot. No preparing.' },
+  { date:'2026-10-20', label:'Tue 20 Oct',  emoji:'💃', title:'Salsa Social',         price:1800, blurb:'No partner, no experience, everybody rotates. Half an hour and you can actually do it.' },
+  { date:'2026-10-27', label:'Tue 27 Oct',  emoji:'🎃', title:'Halloween',            price:2200, blurb:'Costumes, a photo wall, and a room-wide game of Mafia. Spare costumes at the door.' },
+  { date:'2026-11-03', label:'Tue 3 Nov',   emoji:'🎙️', title:'Pitch Your Friend',    price:1800, blurb:'Sixty seconds to convince the room to be friends with someone you met an hour ago.' },
+  { date:'2026-11-10', label:'Tue 10 Nov',  emoji:'🍕', title:'No Small Talk',        price:1800, blurb:'No jobs, no weather. Question cards that go somewhere real, and pizza. No cameras.' },
+  { date:'2026-11-17', label:'Tue 17 Nov',  emoji:'🗣️', title:'Debate Night',         price:1800, blurb:"Pineapple on pizza. Voice notes over two minutes. You don't get to pick your side." },
+  { date:'2026-11-24', label:'Tue 24 Nov',  emoji:'🦃', title:'Friendsgiving',        price:2500, blurb:'One long table, proper food, and everyone thanking someone they met three hours ago.' },
+];
+
+/* ---------------- nothing below here needs editing ---------------- */
+const money = n => 'KES ' + n.toLocaleString('en-KE');
+const today = new Date(); today.setHours(0,0,0,0);
+const upcoming = NIGHTS.filter(n => new Date(n.date + 'T23:59:59') >= today);
+const next = upcoming[0] || NIGHTS[NIGHTS.length - 1];
+
+// WhatsApp links, pre-filled with the night they're booking
+const waText = encodeURIComponent(
+  `Hi Fika! I'd like to book a seat for ${next.title} on ${next.label}. 🧡`
+);
+const waURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${waText}`;
+document.querySelectorAll('[data-wa]').forEach(a => { a.href = waURL; a.target = '_blank'; a.rel = 'noopener'; });
+document.querySelectorAll('[data-ig]').forEach(a => {
+  a.href = `https://instagram.com/${INSTAGRAM_HANDLE}`; a.target = '_blank'; a.rel = 'noopener';
+});
+
+// Next-up chip
+const set = (sel, val) => { const el = document.querySelector(sel); if (el) el.textContent = val; };
+set('[data-next-title]', `${next.emoji}  ${next.title}`);
+set('[data-next-date]',  next.label);
+set('[data-next-price]', money(next.price));
+
+// Cards
+const grid = document.getElementById('grid');
+grid.innerHTML = NIGHTS.map((n, i) => {
+  const past = new Date(n.date + 'T23:59:59') < today;
+  const isNext = n.date === next.date && !past;
+  return `
+  <article class="lift group relative flex flex-col rounded-2xl border ${isNext ? 'border-ox/40 ring-1 ring-ox/25' : 'border-sand'} bg-card p-6 shadow-[var(--shadow-soft)] ${past ? 'opacity-45' : ''}">
+    ${isNext ? '<span class="absolute -top-2.5 left-6 rounded-full bg-ox px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-paper">Up next</span>' : ''}
+    <div class="flex items-start justify-between gap-3">
+      <span class="text-[30px] leading-none" aria-hidden="true">${n.emoji}</span>
+      <span class="rounded-full bg-paper px-2.5 py-1 text-[12px] font-bold text-ink/80 border border-sand">${money(n.price)}</span>
+    </div>
+    <p class="mt-5 text-[13px] font-bold uppercase tracking-[.13em] ${isNext ? 'text-ox' : 'text-ink/55'}">${n.label}</p>
+    <h3 class="mt-1 font-display font-extrabold text-[23px] tight leading-tight">${n.title}</h3>
+    <p class="mt-2.5 text-[15px] leading-relaxed text-ink/80 flex-1">${n.blurb}</p>
+    ${past
+      ? '<p class="mt-5 text-[13.5px] font-bold text-ink/55">Been and gone</p>'
+      : `<a href="${waURL}" target="_blank" rel="noopener" class="mt-5 inline-flex items-center gap-1.5 text-[14.5px] font-bold text-ox hover:text-oxLite transition-colors">
+           Book this one <span class="transition-transform group-hover:translate-x-1 inline-block">→</span>
+         </a>`}
+  </article>`;
+}).join('');
+
+// Sticky mobile CTA — only once the hero's own button has scrolled away
+const sticky = document.getElementById('stickyCta');
+const showSticky = () => {
+  const on = window.scrollY > 520;
+  sticky.classList.toggle('translate-y-full', !on);
+  sticky.classList.toggle('opacity-0', !on);
+};
+showSticky();
+addEventListener('scroll', showSticky, { passive:true });
+</script>
+</body>
+</html>
