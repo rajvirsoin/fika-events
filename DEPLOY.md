@@ -1,5 +1,20 @@
 # Fika site — deploy (free, no domain)
 
+## ✅ LIVE — https://fika-events.pages.dev
+
+Deployed 31 Aug 2026. Cloudflare Pages project **fika-events**, connected to
+**github.com/rajvirsoin/fika-events** (branch `main`, no build command, output `/`).
+**Every `git push` to main redeploys automatically** — no dashboard visit needed.
+
+```bash
+cd "Fika Events/website" && git add -A && git commit -m "..." && git push
+```
+
+⚠️ **The WhatsApp number in the page is still the placeholder `254700000000`.** Every Book button
+currently goes nowhere. Don't share the link until that's swapped (bottom of `index.html`, one line).
+
+---
+
 Static single page. No build step, no framework, no dependencies.
 GitHub holds the code, Cloudflare Pages hosts it and redeploys on every push.
 
