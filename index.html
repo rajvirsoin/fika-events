@@ -566,7 +566,7 @@ tailwind.config = {
           How do I book, and where is it?
           <span class="chev shrink-0 text-ox text-[22px] leading-none">+</span>
         </summary>
-        <p class="pb-6 pr-8 text-[16px] lede text-ink/80">Message us on WhatsApp and we'll send you the venue, a pin, and the payment details. Payment holds your seat. We keep the room deliberately small, so we can't hold a place without it.</p>
+        <p class="pb-6 pr-8 text-[16px] lede text-ink/80">Message us on WhatsApp and we'll send you the payment details and a pin. It's at ABOE, here in Nairobi. Payment holds your seat, and we keep the room deliberately small, so we can't hold a place without it.</p>
       </details>
     </div>
   </div>
@@ -621,18 +621,18 @@ const INSTAGRAM_HANDLE = 'fika.events';        // ← REPLACE
 
 // 3. The nights. Add/edit freely; the page rebuilds itself.
 const NIGHTS = [
-  { date:'2026-09-08', label:'Tue 8 Sept', emoji:'🎲', title:'Game Night', price:1800, blurb:"A different game on every table, and you don't keep your seat, because losers rotate. The easiest possible night to walk into cold." },
-  { date:'2026-09-15', label:'Tue 15 Sept', emoji:'🎵', title:'Music Bingo & Trivia', price:1800, blurb:"Fifteen seconds of a song and a bingo card. Your table is your team, so nobody's playing alone." },
-  { date:'2026-09-22', label:'Tue 22 Sept', emoji:'🎨', title:'Paint Your Neighbour', price:1800, blurb:"You paint the person opposite. They paint you. Nobody here can paint. That's the entire point. You take it home." },
-  { date:'2026-09-29', label:'Tue 29 Sept', emoji:'📊', title:'PowerPoint Roulette', price:1800, blurb:'You present a slide deck you have never seen before, with total conviction. Five minutes. No prep, because prep is impossible.' },
-  { date:'2026-10-06', label:'Tue 6 Oct', emoji:'🧳', title:'New In Town', price:1500, blurb:"For anyone who's moved to Nairobi lately and is starting the friends part from scratch. Locals come along to hand over the good addresses." },
-  { date:'2026-10-13', label:'Tue 13 Oct', emoji:'🎤', title:'Bad Talent Night', price:1800, blurb:'Judged on commitment, not skill. Your team invents an act on the night, and nobody has to perform on their own.' },
-  { date:'2026-10-20', label:'Tue 20 Oct', emoji:'💃', title:'Salsa Social', price:1800, blurb:'No partner, no experience, everybody rotates on the call. Half an hour in you can genuinely do it.' },
-  { date:'2026-10-27', label:'Tue 27 Oct', emoji:'🎃', title:'Halloween', price:2200, blurb:"Costumes, a photo wall, and a room-wide game of Mafia. Spare accessories at the door so nobody's the only one not dressed up." },
-  { date:'2026-11-03', label:'Tue 3 Nov', emoji:'🎙️', title:'Pitch Your Friend', price:1800, blurb:"Sixty seconds to convince the room to be friends with someone you met an hour ago. You're not allowed to pitch yourself." },
-  { date:'2026-11-10', label:'Tue 10 Nov', emoji:'🍕', title:'No Small Talk', price:1800, blurb:'No jobs, no weather. Question cards that go somewhere real, pizza to keep your hands busy, and no cameras all night.' },
-  { date:'2026-11-17', label:'Tue 17 Nov', emoji:'🗣️', title:'Debate Night', price:1800, blurb:"Pineapple on pizza. Voice notes over two minutes. You don't get to pick your side, which is what keeps it friendly." },
-  { date:'2026-11-24', label:'Tue 24 Nov', emoji:'🦃', title:'Friendsgiving', price:2500, blurb:'One long table, proper food, and everyone naming one person they met three hours earlier. Last Tuesday of the season.' },
+  { date:'2026-09-08', label:'Tue 8 Sept',  emoji:'🎲', title:'Game Night',          price:1800, blurb:"A different game on every table, and you don't keep your seat, because losers rotate. The easiest possible night to walk into cold." },
+  { date:'2026-09-15', label:'Tue 15 Sept', emoji:'📊', title:'PowerPoint Roulette',  price:1800, blurb:"You present a slide deck you have never seen before, with total conviction. Five minutes. No prep, because prep is impossible." },
+  { date:'2026-09-22', label:'Tue 22 Sept', emoji:'🎨', title:'Paint Your Neighbour', price:1800, blurb:"You paint the person opposite. They paint you. Nobody here can paint, that's the entire point. You take it home." },
+  { date:'2026-09-29', label:'Tue 29 Sept', emoji:'⏱️', title:'5 Minute Friends',     price:1800, blurb:"Five minutes with one person, then a bell, then someone new. A prompt card on every table so you never have to invent a question." },
+  { date:'2026-10-06', label:'Tue 6 Oct',   emoji:'🧳', title:'New In Town',          price:1500, blurb:"For anyone who's moved to Nairobi lately and is starting the friends part from scratch. Locals come along to hand over the good addresses." },
+  { date:'2026-10-13', label:'Tue 13 Oct',  emoji:'🎤', title:'Bad Talent Night',     price:1800, blurb:"Judged on commitment, not skill. Your team invents an act on the night, and nobody has to perform on their own." },
+  { date:'2026-10-20', label:'Tue 20 Oct',  emoji:'💃', title:'Salsa Social',         price:1800, blurb:"No partner, no experience, everybody rotates on the call. Half an hour in you can genuinely do it." },
+  { date:'2026-10-27', label:'Tue 27 Oct',  emoji:'🎃', title:'Halloween',            price:2200, blurb:"Costumes, a photo wall, and a room-wide game of Mafia. Spare accessories at the door so nobody's the only one not dressed up." },
+  { date:'2026-11-03', label:'Tue 3 Nov',   emoji:'🎙️', title:'Pitch Your Friend',    price:1800, blurb:"Sixty seconds to convince the room to be friends with someone you met an hour ago. You're not allowed to pitch yourself." },
+  { date:'2026-11-10', label:'Tue 10 Nov',  emoji:'🍕', title:'Pizza & No Small Talk',price:1800, blurb:"You make the pizza, then you eat it over question cards that go somewhere real. No jobs, no weather, no cameras." },
+  { date:'2026-11-17', label:'Tue 17 Nov',  emoji:'🗣️', title:'Debate Night',         price:1800, blurb:"Pineapple on pizza. Voice notes over two minutes. You don't get to pick your side, which is what keeps it friendly." },
+  { date:'2026-11-24', label:'Tue 24 Nov',  emoji:'🦃', title:'Friendsgiving',        price:2500, blurb:"One long table, proper food, then Mafia. Everyone names one person they met three hours earlier. Last Tuesday of the season." },
 ];
 
 /* ---------------- nothing below here needs editing ---------------- */
