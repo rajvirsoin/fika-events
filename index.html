@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fika · Nairobi's Tuesday night for making friends</title>
-<meta name="description" content="Every Tuesday at ABOE in Peponi, Nairobi: a night that's actually run, with buffet dinner included in the KES 1,800 ticket. Book a seat on WhatsApp.">
+<meta name="description" content="Every Tuesday at ABOE in Peponi, Nairobi: a night that's actually run, with buffet dinner included in the ticket. Book a seat on WhatsApp.">
 <meta property="og:title" content="Fika · Nairobi's Tuesday night for making friends">
 <meta property="og:description" content="A Tuesday night built so you don't have to work a room. You're seated, there's a host, there's a prompt on the table, and dinner's included.">
 <meta property="og:type" content="website">
@@ -191,7 +191,7 @@ tailwind.config = {
 
     <p class="rise d3 mt-6 max-w-[42ch] text-[17px] md:text-[19px] lede text-ink/80">
       Book on WhatsApp, turn up at seven. You're given a name tag and walked to a table, seated with
-      people you haven't met, given something to do, and fed. Buffet dinner is in the KES 1,800 ticket.
+      people you haven't met, given something to do, and fed. Buffet dinner is in the ticket.
       There's no point in the evening where you're expected to work the room.
     </p>
 
@@ -489,7 +489,7 @@ tailwind.config = {
 
           <div class="border-t md:border-t-0 border-sand p-7 md:p-9 flex flex-col justify-center">
             <p class="text-[12.5px] font-bold uppercase tracking-[.16em] text-ink/55">Every Tuesday</p>
-            <p class="mt-3 text-[15px] leading-relaxed text-ink/80">Same price every week, whatever the night is. No surprise pricing for the bigger ones.</p>
+            <p class="mt-3 text-[15px] leading-relaxed text-ink/80">That's a standard Tuesday. A few of the bigger nights are priced on their own, and the price is always on the night's card before you book.</p>
             <a href="#" data-wa class="btn mt-6 inline-flex items-center justify-center gap-2.5 rounded-full bg-ox px-6 py-3.5 text-[15.5px] font-bold text-paper shadow-[0_12px_26px_-12px_rgba(84,20,9,.6)] hover:bg-oxLite">
               Book on WhatsApp
             </a>
@@ -616,11 +616,14 @@ const WHATSAPP_NUMBER = '254701511381';   // 0701511381, also the M-Pesa number
 const INSTAGRAM_HANDLE = 'fikaevents.ke';
 
 // 3. The nights. Add/edit freely; the page rebuilds itself.
+//    `price` is what a seat costs. Add `early` only on a night that has an
+//    early bird: the card then shows the early price, with `price` as the
+//    second release. Leave `early` off and the night is single priced.
 const NIGHTS = [
   { date:'2026-09-08', label:'Tue 8 Sept',  emoji:'🎲', title:'Game Night',          price:1800, blurb:"A different game on every table, and you don't keep your seat, because losers rotate. The easiest possible night to walk into cold." },
   { date:'2026-09-15', label:'Tue 15 Sept', emoji:'📊', title:'PowerPoint Roulette',  price:1800, blurb:"You present a slide deck you have never seen before, with total conviction. Five minutes. No prep, because prep is impossible." },
   { date:'2026-09-22', label:'Tue 22 Sept', emoji:'🎨', title:'Paint Your Neighbour', price:1800, blurb:"You paint the person opposite. They paint you. Nobody here can paint, that's the entire point. You take it home." },
-  { date:'2026-09-29', label:'Tue 29 Sept', emoji:'⏱️', title:'5 Minute Friends',     price:1800, blurb:"Five minutes with one person, then a bell, then someone new. A prompt card on every table so you never have to invent a question." },
+  { date:'2026-09-29', label:'Tue 29 Sept', emoji:'⏱️', title:'5 Minute Friends',     price:3000, early:2500, blurb:"Five minutes with one person, then a bell, then someone new. A prompt card on every table so you never have to invent a question. All you can eat vegetarian sushi." },
   { date:'2026-10-06', label:'Tue 6 Oct',   emoji:'🧳', title:'New In Town',          price:1800, blurb:"For anyone who's moved to Nairobi lately and is starting the friends part from scratch. Locals come along to hand over the good addresses." },
   { date:'2026-10-13', label:'Tue 13 Oct',  emoji:'🎤', title:'Bad Talent Night',     price:1800, blurb:"Judged on commitment, not skill. Your team invents an act on the night, and nobody has to perform on their own." },
   { date:'2026-10-20', label:'Tue 20 Oct',  emoji:'💃', title:'Salsa Social',         price:1800, blurb:"No partner, no experience, everybody rotates on the call. Half an hour in you can genuinely do it." },
@@ -651,7 +654,7 @@ document.querySelectorAll('[data-ig]').forEach(a => {
 const set = (sel, val) => { const el = document.querySelector(sel); if (el) el.textContent = val; };
 set('[data-next-title]', `${next.emoji}  ${next.title}`);
 set('[data-next-date]',  next.label);
-set('[data-next-price]', money(next.price));
+set('[data-next-price]', next.early ? `${money(next.early)} early bird` : money(next.price));
 
 // Cards
 const grid = document.getElementById('grid');
@@ -663,11 +666,14 @@ grid.innerHTML = NIGHTS.map((n, i) => {
     ${isNext ? '<span class="absolute -top-2.5 left-6 rounded-full bg-ox px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-paper">Up next</span>' : ''}
     <div class="flex items-start justify-between gap-3">
       <span class="text-[30px] leading-none" aria-hidden="true">${n.emoji}</span>
-      <span class="rounded-full bg-paper px-2.5 py-1 text-[12px] font-bold text-ink/80 border border-sand">${money(n.price)}</span>
+      ${n.early
+        ? `<span class="rounded-full bg-ox px-2.5 py-1 text-[12px] font-bold text-paper">${money(n.early)} early bird</span>`
+        : `<span class="rounded-full bg-paper px-2.5 py-1 text-[12px] font-bold text-ink/80 border border-sand">${money(n.price)}</span>`}
     </div>
     <p class="mt-5 text-[13px] font-bold uppercase tracking-[.13em] ${isNext ? 'text-ox' : 'text-ink/55'}">${n.label}</p>
     <h3 class="mt-1 font-display font-extrabold text-[23px] tight leading-tight">${n.title}</h3>
     <p class="mt-2.5 text-[15px] leading-relaxed text-ink/80 flex-1">${n.blurb}</p>
+    ${n.early ? `<p class="mt-3 text-[13px] font-semibold text-ink/55">Early bird, then ${money(n.price)} on second release</p>` : ''}
     ${past
       ? '<p class="mt-5 text-[13.5px] font-bold text-ink/55">Been and gone</p>'
       : `<a href="${waURL}" target="_blank" rel="noopener" class="mt-5 inline-flex items-center gap-1.5 text-[14.5px] font-bold text-ox hover:text-oxLite transition-colors">
